@@ -1,0 +1,1597 @@
+---
+title: "R Tutorat"
+author: "Nick Glättli"
+subtitle: "Die Basics für deine BA-Arbeit"
+footer: "FV Polito, 01.03.2025"
+logo: uzh_logo_d_pos_web_main.jpg
+format:
+  revealjs:
+    slide-number: true
+    code-line-numbers: false
+    code-copy: true
+    embed-resources: true
+    self-contained-math: true
+    
+execute:
+  echo: TRUE
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+
+## Organisatorisches
+
+Tutorat in deutscher Sprache (Question in English are welcome!)
+
+Dauer: 01.03.2025 09.00 bis 12.00 Uhr, 08.03.2025 09.00 bis 12.00 Uhr
+
+Pause: Nach Bedarf (Bitte Melden)
+
+Fragen jederzeit stellen!
+
+Slides in html, Code kann in Slides kopiert werden
+
+## Voraussetzungen
+
+-   R und RStudio installiert und laufend
+-   R up to date (sicher R 4.4.0)
+-   Basisverständnis von R und der RStudio Umgebung
+
+> Den Rest schauen wir an, ich helfe gerne!
+
+## Ziel des Tutorates
+
+-   Vorbereitung auf die BA Arbeit
+-   Vermittlung relevanter R-Kenntnisse
+-   Rechnung und Interpretation von Regressionen
+-   Erstellung von Grafiken
+-   Tipps und Tricks
+
+> Geballtes Programm!
+
+
+## Limitation des Tutorates
+
+-   Programmieren lernt man nicht im Hörsaal!
+-   Fokus auf Anwendung: Für eure BA Arbeit
+-   Alles kann ich nicht abdecken
+
+Falls ihre etwas vermisst: Kommt am Mittag auf mich zu!!
+
+## Ablauf
+
+*Tutorat I*
+
+-   Projekt Organisation
+-   Daten handhaben
+-   Daten visualisieren
+-   Lineare Regresssion
+-   Lineare Regressionen interpretieren
+
+---------------------
+
+*Tutorat II*
+
+-   Kurzer recap
+-   Logistische Regression
+-   Regressionen und Ergebnisse visualisieren
+-   Tips und Tricks
+-   Eure Fragen
+
+
+# Projektorganisation
+
+## Achtung!
+
+Nehmt diese Grundlagen und Regeln ernst. Es erspart euch viel Zeit und Ärger.
+
+## Weshalb R?
+
+-   Vielseitig einsetzbar
+-   Schnelle Berechnung
+-   Anbindung an andere Dienste
+
+> Nachgefragt im Arbeitsmarkt (Industriestandard)
+
+## Ansprüche an unseren Code
+
+-   Funktioniert und Ergebnis korrekt
+-   Verständlich
+-   Repoduzierbar
+-   Effizient
+
+## Effizienter Code
+
+-   Programmierer sind faul! (oder einfach schlau)
+-   Keine Wiederholungen im Code
+-   Wenig Code schreiben
+-   Berechnungsdauer reduzieren
+
+> Funktionen oder Loops nutzen
+
+```{r, echo=TRUE}
+#Ineffizient
+1 + 2 + 3 + 4 + 5 + 6
+
+#Effizient
+sum(c(1:6))
+```
+
+## Best Practices I
+
+-   Code in *Skripten* schreiben (Niemals Konsole nutzen!)
+-   Resultate stets als Objekt speichern
+-   Skripte IMMER in *Projekten* öffnen
+
+Weshalb? Code muss reproduzierbar sein! Ihr arbeitet nicht bloss einen Tag an eurer Arbeit.
+
+## Best Practises II
+
+-   Code direkt kommentieren
+-   Code Abschnitte beschreiben `## Überschrift 1 ####`
+
+
+![](Code_annotation.png){fig-align="center" width="300"}
+
+## Best Practises III
+
+-   Code übersichtlich gestalten!
+-   Code aufteilen in sinnvolle Schritte
+-   Zeielnumbrüche innerhalb von Funktionen
+
+![](code_organising.png){fig-align="center" width="300"}
+
+## Best Practises IV
+
+Projekt organisieren!
+
+Ich empfehle:
+
+-   Data-Ordner
+-   Plots-Ordner
+-   Tables-Ordner
+
+# R-Basics
+
+## Klassen
+
+Unsere Daten kommen in verschiedenen Klassen: Numeric, Character und Logical. Zu welcher Klasse ein Datentyp gehört finden wir mit dem `class()` Befehl heraus.
+
+```{r, echo=TRUE}
+class(666)
+
+class("Polito")
+
+class(TRUE)
+```
+
+------------------------------------------------------------------------
+
+Alternativ:
+
+```{r, echo=TRUE}
+is.numeric("Polito")
+is.numeric(666)
+```
+
+Logical: Eine spannende Klasse! Auch damit kann man Rechnen.
+
+```{r, echo=TRUE}
+TRUE+TRUE+FALSE 
+```
+
+## Spezialklasse Factor
+
+Factors geben den Ausprägungen eine Reihenfolge.
+
+```{r, eval=FALSE, echo=TRUE}
+factor(c("Primarschule", "Sekundarschule", "Universität"))
+```
+
+Factors können unser Leben schnell vereinfachen. Beispielsweise bei Regressionstabellen oder Visualisierungen.
+
+
+## Base R
+
+Mit Base R müssen wir nichts laden. Wir können einfach starten!
+
+```{r, echo=TRUE}
+#Wurzel
+sqrt(9)
+
+#Anzahl Buchstaben
+nchar("Olivia")
+```
+
+## Libraries
+
+Zusätzliche Packages können wir einfach herunterladen.
+
+```{r,echo=TRUE, eval=FALSE}
+#Package downloaden von CRAN
+install.packages("tidyverse")
+library(tidyverse)
+
+#Package von GitHub
+# install.packages("devtools")
+devtools::install_github("NickGlaettli/ggthemepark")
+```
+
+GitHub hat viele zusätzliche Packages die nicht auf CRAN sind. Dort suchen lohnt sich!
+
+## Hilfe, was ist der Input?
+
+```{r, echo=TRUE}
+mean(c(1,9, NA, 7))
+```
+
+Und was jetzt?
+
+R hat ein Hilfesystem:
+
+```{r, eval=FALSE, echo=TRUE}
+?mean
+```
+
+> Internet hilft auch
+
+## Vektor
+
+Vektoren beinhalten Informationen, können aber nur einer Klasse angehören.
+
+```{r, echo=TRUE}
+c(1, 8, "G")
+```
+
+Aber können wir unsere Aufgaben mit Vektoren lösen? Jein.
+
+Lösung: Daten brauchen Kontext: Kombination von Vektoren zu Data Frames.
+
+## Data Frames
+
+Data frames sind im Grunde Tabellen, wie wir sie auch aus Excel kennen.
+
+-   Jede Spalte hat einen Namen (Reihen haben selten auch welche)
+
+-   Eine Spalte ist ein Vektor
+
+-   Spalten können verschiedene Klassen haben. Nur eine Klasse pro Spalte.
+
+-   Reihennummer startet bei 1 (Achtung Python User!)
+
+------------------------------------------------------------------------
+
+## Spalten auswählen
+
+Spalten werden mit `$` ausgewählt. Wenn wir also aus dem iris Datensatz die durchscnittliche Sepal Länge wissen wollen:
+
+```{r}
+mean(iris$Sepal.Length, na.rm = T)
+```
+
+
+# Data Wrangling
+
+## Base R oder welche library?
+
+![](27ey1rdre84z.jpeg){fig-align="center" width="500"}
+
+## Wieso tidyverse?
+
+-   Vieles wäre auch in Base R oder mit anderen packages möglich
+
+-   tidyverse ist in (fast) allem besser
+
+-   Der Code ist lesbarer und effizienter
+
+## Starten mit der Pipe
+
+-   Die Pipe ist vereinfacht dein Code massiv!
+
+-   Sie ist integraler Teil des tidyverse
+
+-   So funktioniert sie: umschliesst Funktion um Funktion
+
+-   Schreibweise: `|>` oder `%>%`
+
+## Beispiel mit Pipe
+
+```{r, echo=TRUE}
+library(tidyverse)
+#Code without pipes
+summarise(group_by(iris, Species), count = n())
+#Same code using pipes
+iris |>
+group_by(Species) |>
+summarise(count = n())
+```
+
+## Tidy Data
+
+Prinzip von Tidy Data:
+
+-   Jede Spalte ist eine Variable
+-   Jede Reihe ist eine Observation
+-   Jede Zelle ist ein Wert
+
+```{r}
+head(iris)
+```
+
+## Daten importieren
+
+-   Wir nutzen wieder (extended) tidyverse
+-   Hauptsächlich `readr`, `readxl` und `haven`
+
+```{r, eval=FALSE}
+#import csv file
+data <- read_csv("datafile.csv")
+
+#import rds file
+data <- read_rds("datafile.rds")
+
+#import the third sheet of a excel file (sheet = 1 is the default)
+library(readxl)
+data <- read_excel("datafile.xlsx", sheet = 3)
+
+#import dta file
+library(haven)
+data <- read_dta("mydata.dta")
+```
+
+> Achtung: Pfad beachten
+
+## Daten checken
+
+Immer wichtig ist genau zu wissen wie eure Daten aussehen:
+
+-   Hat es NA?
+-   Gibt es Zahlencodes für NA?
+-   Gibt es Zahlencodes für Factor?
+-   Wurden die Daten korrekt eingegeben?
+
+-------------
+
+```{r}
+table(iris$Species, useNA = "always")
+
+unique(iris$Species)
+
+max(iris$Sepal.Length)
+```
+
+
+## Variablen auswählen: Select
+
+-   Oft hat ein Datensatz viele hundert Variablen
+-   Zur besseren Übersicht wollen wir daher gewisse Variablen auswählen
+-   Dazu benutzen wir die Funktion `select()`
+
+```{r, eval=FALSE}
+schlegel::selects2015 |>
+  select(gender, age, canton, education, vote_choice)
+
+schlegel::selects2015 |>
+  select(gender:vote_choice)
+```
+
+
+## Daten sortieren: Arrange
+
+Manchmal müssen wir unsere Daten sortieren. Bspw. um uns besser zu orientieren oder um eine leserliche Tabelle zu exportieren. Dazu nutzen wir `arrange()`.
+
+```{r}
+schlegel::selects2015 |>
+  select(gender, age) |>
+  arrange(age) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+> By default: Aufsteigend
+
+Was machen wenn wir absteigend sortieren wollen?
+
+```{r}
+schlegel::selects2015 |>
+  select(gender, age) |>
+  arrange(-age) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+Oder:
+
+```{r}
+schlegel::selects2015 |>
+  select(gender, age) |>
+  arrange(desc(age)) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+Wir können aber natürlich auch strings (character) alphabetisch sortieren.
+
+```{r}
+schlegel::selects2015 |>
+  select(gender, age) |>
+  arrange(gender) |>
+  head()
+```
+
+## Daten filtern: Filter
+
+Oft müssen wir unsere Daten nach Kriterien filtern. Dazu nutzen wir `filter()`.
+
+```{r}
+schlegel::selects2015 |>
+  select(gender, age, canton) |>
+  filter(canton == "Zurich") |>
+  head()
+```
+
+## Wichtige Operationszeichen
+
+-   "==" gleich
+-   "!=" ungleich
+-   "\>=" grösser gleich
+-   "\<=" kleiner gleich
+-   "\>" grösser als
+-   "\<" kleiner als
+
+## Übung select, arrange und filter
+
+Wir nutzen den swiss_popular_bills Datensatz vom schlegel-Package.
+
+1.  Reduziere den Datensatz auf die Variablen *date*, *turnout*, *no*, *yes_prop*, *yes*, *canton* und *community*. Speicher den neuen Datensatz im Environment.
+
+2.  Wann fand die erste Abstimmung in den Daten statt?
+
+3.  Wie oft war die Zustimmung über 99%?
+
+4.  Welche Gemeinde hatte die höchste Beteiligung im Thurgau?
+
+## Lösungen: select, arrange und filter
+
+Aufgabe 1:
+
+```{r}
+popvotes_red <- select(schlegel::swiss_popular_bills, 
+                       date, bill, turnout, 
+                       yes:yes_prop, canton, 
+                       community)
+```
+
+------------------------------------------------------------------------
+
+Aufgabe 2:
+
+```{r}
+popvotes_red |>
+  arrange(date) |>
+  head()
+
+min(popvotes_red$date)
+```
+
+------------------------------------------------------------------------
+
+Aufgabe 3:
+
+```{r}
+popvotes_red |>
+  filter(yes_prop > 99)
+```
+
+------------------------------------------------------------------------
+
+Aufgabe 4:
+
+```{r}
+popvotes_red |>
+  filter(canton == "Thurgau") |>
+  select(turnout, community) |>
+  arrange(desc(turnout)) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+Aber:
+
+```{r}
+popvotes_red |>
+  filter(canton == "Thurgau") |>
+  select(turnout, community) |>
+  arrange(turnout) |>
+  head()
+```
+
+Nicht lösbar? Was müssten wir tun?
+
+## Daten transformieren: Mutate
+
+`mutate()` ist die Basisfunktion für Datentransformationen.
+
+Was mutate macht: Neue Variable
+
+```{r}
+selects2015_red <- select(schlegel::selects2015, gender, 
+                          age, canton, education, vote_choice)
+
+selects2015_red |>
+  mutate(new_variable = "new") |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+```{r}
+iris |>
+  mutate(
+    relation_petal = Petal.Length / Petal.Width,
+    relation_septal = Sepal.Length / Sepal.Width) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+```{r}
+iris2 <- iris
+iris2$relation_petal <- iris2$Petal.Length/iris2$Petal.Width
+iris2$relation_sepal <- iris2$Sepal.Length/iris2$Sepal.Width
+head(iris2)
+```
+
+## case_match()
+
+Wir können jetzt einfache Variablen erstellen. Aber was wenn wir recodieren wollen?
+
+```{r}
+selects2015_red <- selects2015_red |>
+  mutate(vote_choice_rec = 
+           case_match(
+             vote_choice,
+             "BDP" ~ "Die Mitte",
+             "CVP" ~ "Die Mitte",
+             .default = vote_choice
+           )
+  )
+```
+
+------------------------------------------------------------------------
+
+```{r}
+table(selects2015_red$vote_choice, selects2015_red$vote_choice_rec, 
+      useNA = "always")
+```
+
+## case_when()
+
+Wenn wir Konditionen haben, nutzen wir `case_when()`.
+
+```{r}
+selects2015_red <- selects2015_red |>
+  mutate(age_cat = case_when(
+    age < 25 ~ "normal",
+    age >= 25 & age < 50 ~ "old",
+    age >= 50 & age < 65 ~ "very old",
+    age >= 65 ~ "practically dead",
+    T ~ NA
+  ))
+
+table(selects2015_red$age_cat, useNA = "always")
+```
+
+Haben wir NA's gemacht?
+
+------------------------------------------------------------------------
+
+Ideen wie wir das checken könnten?
+
+. . .
+
+```{r}
+sum(is.na(selects2015_red$age))
+
+```
+
+. . .
+
+```{r}
+summary(selects2015_red$age)
+```
+
+## ifelse()
+
+Wenn unsere Kondition nur zwei Ausprägungen hat, nutzen wir `ifelse()`. Weil wir faul sind...
+
+```{r}
+selects2015_red <- selects2015_red |>
+  mutate(
+    geschlecht = ifelse(gender == "male", "Mann", "Frau"))
+
+table(selects2015_red$gender, selects2015_red$geschlecht, useNA = "always")
+```
+
+***Funktioniert aber nur, wenn keine NA vorhanden sind!***
+
+## Mehrere Mutationen aufs mal
+
+```{r, eval=FALSE}
+selects2015_red <- selects2015_red |>
+  mutate(
+    vote_choice_rec = 
+           case_match(
+             vote_choice,
+             "BDP" ~ "Die Mitte",
+             "CVP" ~ "Die Mitte",
+             .default = vote_choice
+           ),
+    
+    age_cat = case_when(
+      age < 25 ~ "normal",
+      age >= 25 & age < 50 ~ "old",
+      age >= 50 & age < 65 ~ "very old",
+      age > 65 ~ "practically dead",
+      T ~ NA),
+    
+    geschlecht = ifelse(gender == "male", "Mann", "Frau"))
+
+
+```
+
+## Wichtige Funktionen für Klassenwechsel
+
+Oft kommen unsere Daten in falschen Formaten. Bspw. numerische Daten als character.
+
+Hier können wir folgende funktionen gut verwenden:
+
+-   as.numeric()
+-   as.character()
+-   as.factor()
+
+## Mehrere Spalten gleichzeitig mutieren
+
+```{r, warning=FALSE}
+mtcars |>
+  mutate(across(c(drat, wt, qsec), round, 1)) |>
+  head()
+```
+
+Auch hilfreich: everything, starts_with, ends_if
+
+-----------------
+```{r, warning=FALSE}
+iris |>
+  mutate(across(where(is.numeric), round)) |>
+  head()
+```
+
+## Übung: mutate
+
+Wir arbeiten wieder mit dem popularvotes Datensatz.
+
+1.  Füge eine neue Variable hinzu, die das Jahrhundert angibt.
+2.  In der "turnout" Variable gibt es "...". Mache diese zu NA.
+3.  Rechne den turnout von Hand in einer neuen Variable. Kontrolliere die Korrektheit indem du die beiden subtrahierst.
+
+## Lösungen: mutate
+
+Aufgabe 1:
+
+```{r}
+popvotes_red <- popvotes_red |>
+  mutate(century= case_when(
+    year(date) >= 2000 ~ "21st",
+    year(date) < 2000 ~ "20th",
+    T ~ NA
+  ))
+
+head(popvotes_red)
+```
+
+------------------------------------------------------------------------
+
+Oder auch weniger effizient:
+
+```{r}
+popvotes_red |>
+  mutate(century= case_when(
+    year(date) >= "2000-01-01" ~ "21st",
+    year(date) < "2000-01-01" ~ "20th",
+    T ~ NA
+  )) |>
+  head()
+```
+
+------------------------------------------------------------------------
+
+Aufgabe 2:
+
+```{r}
+popvotes_red <- popvotes_red |>
+  mutate(turnout = case_match(
+    turnout,
+    "..." ~ NA,
+    .default = turnout
+  ))
+
+sum(is.na(popvotes_red$turnout))
+```
+
+------------------------------------------------------------------------
+
+Aufgabe 3:
+
+```{r}
+popvotes_red <- popvotes_red |>
+  mutate(
+    yes_num = as.numeric(yes),
+    no_num = as.numeric(no),
+    yes_prop_num = as.numeric(yes_prop),
+    
+    yes_prop_2 = (yes_num / (yes_num + no_num))*100,
+    test_dif= yes_prop_num - yes_prop_2
+  )
+
+sum(abs(popvotes_red$test_dif), na.rm = T)
+```
+
+Wer weiss wo das Problem ist?
+
+------------------------------------------------------------------------
+
+```{r}
+popvotes_red |>
+  mutate(test_dif= yes_prop_num - round(yes_prop_2, digits = 1)) |>
+  select(yes_prop, yes_prop_2, test_dif) |>
+  head()
+```
+
+Stimmts jetzt?
+
+## Daten aggrergieren: summarise
+
+Jetzt wirds spannend. Wir wollen schliesslich aus unseren Daten lernen. Um sie zu aggregieren nutzen wir `summarise()`. Funktionsweise ist sehr simpel:
+
+```{r}
+selects2015_red |>
+  summarise(mean_age = mean(age, na.rm = T))
+```
+
+. . .
+
+```{r}
+selects2015_red |>
+  summarise(mean_age = mean(age, na.rm = T),
+            median_age = median(age, na.rm = T),
+            mean_skew = mean_age - median_age,
+            num_resp = n())
+```
+
+## group_by()
+
+In der Regel wollen wir Werte über Grppen erfahren. Wir müssen unsere Daten also gruppieren:
+
+```{r}
+selects2015_red |>
+  group_by(gender) |>
+  summarise(mean_age = mean(age, na.rm = T))
+```
+
+------------------------------------------------------------------------
+
+Wir können aber auch nach mehreren Variablen gruppieren:
+
+```{r}
+selects2015_red |>
+  group_by(gender, age_cat) |>
+  summarise(mean_age = mean(age, na.rm = T)) |>
+  na.omit()
+```
+
+Manchmal muss man die Daten wieder entgruppieren. Das machen wir mit `ungroup()`.
+
+## Nützliche Funktionen zur Aggregation
+
+-   n()
+-   count()
+-   tally()
+
+# Daten Visualisieren
+
+## Prinzipien der Datenvisualisierung I
+
+-   Achsen sind **SINNVOLL** zu beschriften
+-   Simpel > Komplex
+-   Jeder Aspekt muss eine Berechtigung haben (auch Beschriftungen)
+-   Einfach zu lesen
+
+## Prinzipien der Datenvisualisierung II
+
+-   Grafiken unterstützen Argumente
+-   Irrelevante Informationen sollen rausgenommen werden
+-   **Keine Pie-Charts!!!!**
+
+## Was nutzen wir?
+
+Vereinfacht gibt es zwei Möglichkeiten um Plots zu erstellen:
+
+-   Base R
+
+-   ggplot2
+
+Wir nutzen ggplot2 weil:
+
+-   tidyverse (kann in pipeline genutzt werden)
+
+-   einfacherer Code
+
+-   bessere Grafiken
+
+## Mit ggplot starten
+
+```{r}
+#library(tidyverse)
+#library(ggplot2)
+
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width))+
+  geom_point()
+```
+
+------------------------------------------------------------------------
+
+```{r, eval=FALSE}
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width))+
+  geom_point()
+```
+
+1.  Daten spezifizieren (falls in Pipe weglassen)
+
+2.  x und y Werte spezifizieren in der aes Funktion
+
+3.  Bausteine hinzufügen
+
+## Bausteinsystem von ggplot
+
+> Wer zuerst kommt, malt zuerst
+
+```{r, echo=FALSE}
+x <- c("A","B")
+y <- c(5,8)
+data <- data.frame(x,y)
+```
+
+```{r, fig.height= 4}
+ggplot(data, aes(x= x, y= y))+
+  geom_hline(yintercept= 4, color= "red")+
+  geom_bar(stat= "identity")
+```
+
+------------------------------------------------------------------------
+
+```{r, fig.height= 6}
+ggplot(data, aes(x= x, y= y))+
+  geom_bar(stat= "identity")+
+  geom_hline(yintercept= 4, color= "red")
+```
+
+## geom_bar vs. geom_col
+
+-   `geom_bar` benötigt nur x-Werte
+-   Per default aggregiert die Funktion die x Werte
+-   Wenn ihr das nicht wollt: `stat = "identity"`
+-   Besser: Für barplots `geom_col` nutzen
+
+------------------------------------------------------------------------
+
+```{r}
+ggplot(iris, aes(x= Species))+
+  geom_bar()
+```
+
+------------------------------------------------------------------------
+
+```{r}
+iris |>
+  group_by(Species) |>
+  tally() |>
+  ggplot(aes(x= Species, y= n))+
+  geom_col()
+```
+
+## Geoms
+
+Nicht abschliessende Liste:
+
+-   line
+
+-   bar
+
+-   col
+
+-   point
+
+-   boxplot
+
+-   errorbar
+
+-   smooth
+
+## Welche Geoms wähle ich? I
+
+-   Daten können verschieden dargestellt werden!
+-   Zentrale Frage: Welche Darstellung bildet die Daten und das Argument am besten ab?
+-   Geoms können auch kombiniert werden
+-   Viele Untertützung im Netz
+
+## Welche Geoms wähle ich? II
+
+Diskrete Variablen
+
+-   Barplots (bar/col)
+
+Kontinuierliche Variablen
+
+-   Scatterplots (point)
+
+Zeitreihen
+
+-   Linienplots (line)
+
+---------
+
+Verteilung
+
+-   Boxplots (boxplot)
+-   Violinenplots (violin)
+-   Dichteplot (density)
+
+Effekte
+
+-   Fehlerbalken (errorbar)
+-   Pointrange
+
+
+## Achtung, nicht alle geoms machen was du willst!
+
+```{r}
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width))+
+  geom_line()
+```
+----
+```{r}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width))+
+  stat_summary(fun = "mean", geom = "line")
+```
+----
+```{r}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width))+
+  geom_smooth(se=F, color="black")
+```
+
+
+## Anschreiben der Variablen + Titel
+
+Theoretisch verschiedene Möglichkeiten. Nutzt `labs`!
+
+```{r, fig.height=3.8}
+ggplot(iris, aes(x= Species))+
+  geom_bar()+
+  labs(title = "Number of Observations per Species", 
+       subtitle = "Counted by Dr. XV",
+       x = NULL, y = "number of observations",
+       caption = "Source: Iris Dataset")
+```
+
+## Gruppieren
+
+Werte nach Spezies darstellen. Wie würdet ihr das machen?
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width))+
+  geom_point()
+```
+
+## Farbe (Theorie) I
+
+-   Farben haben einen Zweck!
+-   Je dezenter desto besser
+-   Beachtet Farbenblindheit!
+-   Viele Farbpalletten in R verfügbar
+
+## Farbe (Theorie) II
+
+Skalenniveau bestimmt Farbpalette!
+
+Diskret: Qualitative Palette mit unterschiedlichen Farben
+Kontinuierlich: Divergierende oder Sequenzielle Palette
+
+Siehe hier: <https://colorbrewer2.org/>
+
+## Farbe (Anwendung)
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width, color = Species))+
+  geom_point()
+```
+
+## Manuelle Farben
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width, color = Species))+
+  geom_point()+
+  scale_color_manual(values = c("darkred", "dodgerblue", "darkorchid4"))
+```
+
+## Farbpaletten
+
+Viele Optionen!
+Wichtigste sind colorbrewer und viridis
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width, color = Species))+
+  geom_point()+
+  scale_color_brewer(palette = "Dark2")
+```
+
+## Achtung!!!
+
+Gruppierte Farbe gehört in `aes()`! Allgemeine Farbe ausserhalb!
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width), color = Species)+
+  geom_point()
+```
+
+## Ist Farbe notwendig?
+
+-   Zurückhaltung mit Farben
+-   Frabe muss auch immer gerechtfertigt sein! (nur für Gruppierung und auch da nur wenn notwendig)
+-   Wenn Farbe, dann immer anpassen!
+-   Es gibt auch dezente Farbpaletten
+-   Beachtet weitere Gruppierungsmöglichkeiten
+
+## Color vs. Fill
+
+Es gibt zwei Optionen um einzufärben
+
+-   `fill` bei Flächen
+-   `color` bei Linien, Punkten usw.
+
+## Shape
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width, shape = Species))+
+  geom_point()
+```
+
+## Grösse
+
+Hier nicht sinnvoll!
+
+```{r, fig.height=4.5}
+ggplot(iris, aes(x= Sepal.Length, y= Sepal.Width, size = Species))+
+  geom_point()
+```
+
+## Was mache ich bei vielen Datenpunkten?
+
+Überlappende Datenpunkte verzerren Bild!
+
+-   Jittering
+-   Tranzparenz erhöhen
+
+## Ein Beispiel 
+
+::: {.panel-tabset}
+
+## Normal
+
+```{r, message=F, fig.height = 3.5}
+schlegel::selects2015 |>
+  ggplot(aes(x = age, y = lr_self))+
+  geom_point()
+```
+
+## Jittering + Transparenz
+
+```{r, message=F, fig.height = 3.5}
+schlegel::selects2015 |>
+  ggplot(aes(x = age, y = lr_self))+
+  geom_point(alpha = 0.3,
+             position = "jitter")
+```
+
+:::
+
+
+
+## Übung: Plotting
+
+Arbeite mit dem Selects Datensatz. Beschreibe die Achsen sinnvoll.
+
+1.    Plotte die Anzahl Frauen und Männer
+2.    Zeige die Altersverteilung
+
+## Lösungen: Plotting
+```{r, include=FALSE}
+selects <- schlegel::selects2015
+```
+
+Aufgabe 01
+
+```{r, fig.height=4}
+ggplot(selects, aes(x= gender))+
+  geom_bar()+
+  labs(x= "Geschlecht", y= "Anzahl Observationen")
+```
+------------------------------------------------------------------------
+
+Aufgabe 02
+
+```{r, message=FALSE, fig.height=4}
+ggplot(selects, aes(x = age))+
+         geom_density()
+```
+
+## Plots werden schnell unübersichtlich
+
+```{r, message=FALSE, echo=FALSE, fig.height=4}
+selects |>
+  group_by(canton, gender) |>
+  summarise(participation_rate = mean(participation, 
+                                      na.rm = T)) |>
+  ggplot(aes(x = canton, y = participation_rate,
+             fill = gender))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 50, 
+                                   hjust = 1))
+```
+## Der Code
+
+```{r, eval=FALSE}
+selects |>
+  group_by(canton, gender) |>
+  summarise(participation_rate = mean(participation, 
+                                      na.rm = T)) |>
+  ggplot(aes(x = canton, y = participation_rate,
+             fill = gender))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 50, 
+                                   hjust = 1))
+```
+
+
+## Lösung: Small multiples
+
+```{r, message=FALSE, fig.height=5}
+selects |>
+  group_by(canton, gender) |>
+  summarise(participation_rate = mean(participation, 
+                                      na.rm = T)) |>
+  ggplot(aes(x = gender, y = participation_rate,
+             fill = gender))+
+  geom_col()+
+  scale_y_continuous(labels = scales::percent)+
+  facet_wrap(~ canton)
+  
+```
+
+## Daten sortieren
+
+Bei der Datenvisulaisierung gilt: IMMER SINNVOLL SORTIEREN!!
+
+Ideen wo im Code man ansetzen muss?
+
+## Daten sortieren
+
+```{r, fig.height=4}
+mtcars |>
+  group_by(cyl) |>
+  tally() |>
+  ggplot(aes(x= reorder(cyl, n), y= n))+
+  geom_col()
+```
+------------
+```{r, fig.height=4}
+mtcars |>
+  group_by(cyl) |>
+  tally() |>
+  ggplot(aes(x= reorder(cyl, -n), y= n))+
+  geom_col()
+```
+--------------
+
+Ebenfalls möglich: fct_reorder
+
+Wird genau gleich benutzt
+
+## Labels leserlich machen
+
+Problem: Wir können die Beschriftungen nicht lesen
+```{r, fig.height=4}
+ggplot(USArrests, aes(y= UrbanPop, 
+                      x= reorder(rownames(USArrests), UrbanPop)))+
+  geom_col()
+```
+
+## Labels leserlich machen
+
+Wir lösen das Problem indem wir Anpassungen im theme vornehmen.
+
+```{r, fig.height=4}
+ggplot(USArrests, aes(y= UrbanPop,
+                      x= reorder(rownames(USArrests), UrbanPop)))+
+  geom_col()+
+  theme(axis.text.x = element_text(angle = 50, 
+                                   hjust = 1),
+        axis.title.x = element_blank())
+```
+
+## Get the details right!
+
+Grafiken sind nicht das wichtigste! Aber...
+
+-   Theme benutzen (allenfalls eigenes gestalten)
+-   Prozentzeichen einfügen (`scale_y_continous(labels = scales::percent)`)
+-   Legende verschieben
+-   Font anpassen
+
+## Übung: Nachplotten
+
+```{r, echo=FALSE, fig.height=6}
+selects |>
+  mutate(education2 = case_match(education, 
+                              "no graduation" ~ "low education",
+                              "compulsory schooling" ~ "low education",
+                              "apprenticeship" ~ "low education",
+                              "diploma or trading school" ~ "medium education",
+                              "(vocational) matura" ~ "medium education",
+                              "higher vocational degree" ~ "medium education",
+                              "HF" ~ "medium education",
+                              "(applied/teacher) university" ~ 
+                                "high education")) |>
+  group_by(canton, gender, education2) |>
+  tally() |>
+  na.omit() |>
+  group_by(canton, gender) |>
+  mutate(perc = n/ sum(n)) |>
+  ggplot(aes(x= education2, y= perc, fill= gender))+
+  geom_col(position = "dodge")+
+  facet_wrap(~canton)+
+  scale_y_continuous(labels = scales::percent)+
+  scale_fill_manual(values = c("dodgerblue", "darkred"),
+                    labels = c("Männer", "Frauen"))+
+  labs(x= NULL, y= NULL, fill = "Geschlecht",
+       caption = "low bis apprenticeship; medium bis HF; high alles darüber")+
+  theme_bw()+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+## Lösung: Nachplotten
+
+```{r, eval=FALSE, fig.height=6}
+selects |>
+  mutate(education2 = case_match(education, 
+                              "no graduation" ~ "low education",
+                              "compulsory schooling" ~ "low education",
+                              "apprenticeship" ~ "low education",
+                              "diploma or trading school" ~ "medium education",
+                              "(vocational) matura" ~ "medium education",
+                              "higher vocational degree" ~ "medium education",
+                              "HF" ~ "medium education",
+                              "(applied/teacher) university" ~ 
+                                "high education")) |>
+  group_by(canton, gender, education2) |>
+  tally() |>
+  na.omit() |>
+  group_by(canton, gender) |>
+  mutate(perc = n/ sum(n)) |>
+  ggplot(aes(x= education2, y= perc, fill= gender))+
+  geom_col(position = "dodge")+
+  facet_wrap(~canton)+
+  scale_y_continuous(labels = scales::percent)+
+  scale_fill_manual(values = c("dodgerblue", "darkred"),
+                    labels = c("Männer", "Frauen"))+
+  labs(x= NULL, y= NULL, fill = "Geschlecht",
+       caption = "low bis apprenticeship; medium bis HF; high alles darüber")+
+  theme_bw()+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+# Statistik
+
+## Es kommt alles zusammen
+
+-   Data wrangling
+-   Visualisierung
+-   (neu) Modelle rechnen
+-   (neu) Effekte berechnen und visualisieren
+
+## Lineare Regression rechnen und interpretieren
+
+```{r}
+model_lm <- lm(Sepal.Length ~ Sepal.Width + Species, 
+               data = iris)
+summary(model_lm)
+```
+
+## Regressionen interpretieren
+
+Veränderungen zwischen Modellen sind hochrelevant!
+
+![](Regression_table.png){fig-align="center" height="600"}
+
+
+## Regressionen mit Umfragedaten
+
+Die richtigen **Gewichte** verwenden!
+
+```{r}
+survey_model <- lm(lr_self ~ gender + age, 
+               data = schlegel::selects2015,
+               weights = weight_total)
+summary(survey_model)
+```
+
+## Interaktionsterme
+
+```{r}
+model_lm2 <- lm(lr_self ~ age*gender, data = selects)
+summary(model_lm2)
+```
+
+## Quadrieren
+
+Anpassung notwendig, damit R checkt, dass wir quadrieren wollen: I(variable^2)
+
+Oder neue quadrierte variable vorher erstellen.
+
+```{r}
+model_lm3 <- lm(lr_self ~ age + I(age^2) + gender, data = selects)
+```
+
+
+## Regressionstabelle exportieren
+
+Problem: R Output ist nicht schön
+
+Lösung: Tabelle als html oder LaTeX exportieren
+
+Entweder Stargazer oder Texreg eignen sich gut.
+
+```{r, eval=FALSE}
+stargazer::stargazer(model_lm, 
+                     type = "html", 
+                     out = "regressiontable.html")
+```
+
+## Regressionstabelle exportieren
+
+Unbedingt immer Koeffizientennamen leserlich machen und sortieren! 
+
+```{r, eval=FALSE}
+texreg::texreg(model_lm, 
+               custom.coef.names = c("Sepal Length", 
+                                     "Versicolor", 
+                                     "Virginica"))
+```
+
+# Fragen
+
+## Themen fürs nächste Mal
+
+<https://forms.gle/vQ5YJmVNAJ14LJzz6>
+
+# Vielen Dank für eure Aufmerksamkeit
+
+# Statistik II
+
+## Logit modell
+
+Bei binären abhängigen Variablen rechnen wir ein logit Modell. Wieso? 
+
+```{r}
+logit_model <- glm(participation ~ gender*age,
+                   data = selects,
+                   family = binomial)
+summary(logit_model)
+```
+
+## Effekt berechnen
+Logit Modelle können nicht direkt interpretiert werden. Lösung: Vorhergesagte Wahlscheinlichkeiten!
+
+```{r, message=FALSE}
+library(glm.predict)
+predicts(logit_model, "F;Median", type = "simulation")
+```
+
+## Effekt berechnen
+
+Discrecte changes sind auch nützlich!
+```{r, message=FALSE}
+predicts(logit_model, "F;Median", type = "simulation", position = 1)
+```
+
+
+## Effekte Visualisieren
+
+```{r, fig.height=4.5}
+predicts(logit_model, "F; 20-80,5", type = "simulation") |>
+  ggplot(aes(x= age, y= mean,
+             ymin= lower, ymax= upper,
+             color= gender, fill= gender))+
+  geom_ribbon(alpha=0.3)+
+  geom_line()+
+  scale_y_continuous(labels = scales::percent)
+```
+
+## Mehrere Modelle in eine Regressionstabelle
+
+```{r, eval=FALSE}
+texreg::texreg(list(model_lm, model_lm2, logit_model))
+```
+
+
+## T-Test output interpretieren
+
+::: {.panel-tabset}
+## Zweiseitig (default)
+
+```{r}
+t.test(iris$Sepal.Length, iris$Sepal.Width)
+```
+
+## Einseitig (grösser)
+
+``` {r}
+t.test(iris$Sepal.Length, iris$Sepal.Width,
+       alternative = "greater")
+```
+
+## Einseitig (kleiner)
+
+``` {r}
+t.test(iris$Sepal.Length, iris$Sepal.Width,
+       alternative = "less")
+```
+:::
+
+# HelpR
+
+## Wo finde ich hilfe?
+
+-   Man kann nicht alles wissen!
+-   Google ist euer Freund
+-   Viel Information auf Webseiten, Foren, YouTube usw.
+
+> Nicht verzweifeln, einfach mal googeln!
+
+## Was ist mit ChatGPT?
+
+Mittlerweile gutes Tool
+
+-   Zuerst mit Hilfe von Google versuchen!
+-   ChatGPT nutzen bevor Stackoverflow gefragt wird
+-   Kritisch bleiben, Code verstehen!
+
+> ChatGPT kann auch helfen Code von Google usw zu verstehen!
+
+## Persönlichen Austausch nicht vergessen!
+
+-   Sich mit anderen Personen auszutauschen ist sehr hilfreich
+-   Neue Perspektive, neue Ideen
+-   Auch die Methodik könnt ihr so kritisch diskutieren
+
+# Tips und Tricks
+
+## Struktur der Arbeit
+
+-   Einleitung
+-   Literatur und Theorie
+-   Methoden
+-   Resultate
+-   Diskussion
+-   Schlussfolgerungen
+-   Literaturverzeichnis
+-   Anhang
+
+Viele Wege führen nach Rom.
+
+## Zitieren
+
+Nutzt Zitiersoftware!
+
+-   Zotero bei Word
+-   LaTeX
+
+## Wieso LaTeX?
+
+-   Wissenschaftlicher Standard
+-   Einfache Automatisierung
+-   Grosse Flexibilität
+-   Einfaches zitieren mit Google Scholar
+-   Gute Integration der Regressionstabellen
+
+> Overleaf nutzen!
+
+## Anhang: Wofür und was gehört da rein?
+
+Jede Grafik und Tabelle in der Arbeit untertützt euer Argument!
+
+-   Was nichts zur "Story" beiträgt, gehört in den Anhang
+-   Alle Modelle müssen mit einer Regressionstabelle in der Arbeit oder Anhang dargestellt werden
+-   Erstellt viele Plots, aber die meisten kommen in den Anhang
+
+> Anhang dient zur vertieften Information
+
+## Ein Beispiel
+
+![](example_text.png){fig-align="center" height="600"}
+
+## Modelle definieren
+
+**Theorie bestimmt!**
+
+-   Modelle nach und nach aufbauen
+-   *Parsimonität!*
+-   Standard Kontrollvariablen (Alter, Geschlecht, Bildung, Einkommen, Ideologie)
+-   Immer überlegen: Macht das Sinn? Ist das notwendig?
+
+## Was sind robustness checks?
+
+Rubustness checks unterstützen euere Resultate mit anderen Daten
+
+-   Sie liefern mehr Belege für die Validität eurer Resultate
+-   Andere Daten, Variablen, Gewichte usw.
+
+Beispiel meiner MA-Arbeit:
+
+-   Neue Gewichtung der Umfragedaten mit anderen Bevölkerungsverteilungen
+-   Keine getrimmiten Gewichte
+-   Andere proxy Variablen
+
+## Fokus der Arbeit
+
+-   Theoretische Herleitung eurer Hypothesen
+-   Solide Methodik
+-   **Interpretation** eurer Ergebnisse
+
+## Ergebnisse interpretieren
+
+Präsentation der puren Ergebnisse kann oft kurz gehalten werden.
+
+Fragen:
+-   Was heisst das bezgl. meiner Hypothesen?
+-   Was sind mögliche Erklärungen?
+-   Stimmen sie mit der Literatur überein?
+
+> kreativer Prozess
+> think critically!!
+
+## Was ist mit Null-Results?
+
+Signifikanz ist nicht alles!
+
+-   Ist die fehlende Signifikanz überraschend?
+-   Woran liegt es? (Theorie, Methodik, Daten)
+-   Gibt es theoretische Erklärungen für die fehlende Signifikanz?
+
+## Codebooks
+
+Schaut euch die Codebooks ganz genau an!
+
+# Fragen
+
+# Vielen Dank für eure Aufmerksamkeit
